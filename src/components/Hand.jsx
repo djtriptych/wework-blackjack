@@ -34,7 +34,7 @@ class Hand extends React.Component {
         <header>
           {_.capitalize(playerName)}
           <Score score={score} />
-          {deck && <button onClick={() => hit()}>hit</button>}
+          {deck && <button onClick={() => hit(deck.deck_id, playerName)}>hit</button>}
         </header>
         <div className="cards">{fannedCards}</div>
       </div>

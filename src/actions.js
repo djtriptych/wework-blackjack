@@ -27,11 +27,11 @@ export const drawCards = (deck_id, count) => {
   });
 };
 
-export const hit = (deck_id, playerName) => {
+export const hit = (deck_id, player) => {
   actions.push({
     type: Action.hit,
     deck_id,
-    playerName
+    player
   });
 };
 

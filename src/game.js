@@ -7,6 +7,8 @@ import Bacon from "baconjs";
 import { actions, Action } from "./actions";
 import { ACE, QUEEN, KING, JACK, PLAYERS } from "./constants.js";
 
+const playerHits = new Bacon.Bus();
+
 const scoreForCard = card => {
   // Ignore cards that are facing down.
   if (card.facing === "down") {
@@ -49,34 +51,30 @@ const cards = actionsByType(Action.drawCards)
   })
   .map(card => _.extend(card, { facing: "down" }));
 
+// Handle player hits.
+actionsByType(Action.hit)
+  .onValue(action => {
+    const { deck_id, player } = action;
+    const playerCard =
+        Bacon.fromPromise(api.deck.draw(deck_id, 1))
+          .flatMap(response => Bacon.fromPromise(response.json()))
+          .map('.cards')
+          .flatMap(cards => Bacon.fromArray(cards))
+          .map(card => _.extend(card, { facing: 'down'}))
+          .map(card => ({card, player}))
+
+    playerHits.plug(playerCard)
+  })
+
 // The first time a card is flipped, toggle it to face-up. 2nd and subsequent
 // clicks are effectively ignored.
 const cardFlips = actionsByType(Action.flipCard).doAction(action => {
   action.card.facing = action.card.facing === "down" ? "up" : "up";
 });
 
-// As incoming cards come in from the api, distribute them to all players.
-const alternatingPlayers = i => Bacon.once(PLAYERS[i % PLAYERS.length]);
-const players = Bacon.repeat(alternatingPlayers);
-const playerDraws = cards.flatMap(card => {
-  return Bacon.once(card).zip(players.take(1), (card, player) => ({
-    card,
-    player
-  }));
-});
-
-const hits = actionsByType(Action.hit)
-  .map(action => api.deck.draw(action.deck_id, 1))
-  .flatMap(jsonResponse)
-  .map(".cards")
-  .flatMap(cards => {
-    return Bacon.fromArray(cards);
-  })
-  .map(card => _.extend(card, { facing: "down" }));
-
 // "Piles", or player's hands, are a fold of the incoming cards.
-const piles = playerDraws.scan({}, (piles, playerDraw) => {
-  const { player, card } = playerDraw;
+const piles = playerHits.scan({}, (piles, playerHit) => {
+  const { player, card } = playerHit;
   if (!piles[player]) {
     piles[player] = [];
   }
