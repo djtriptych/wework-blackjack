@@ -6,7 +6,10 @@ import { hit } from "../actions";
 class Score extends React.Component {
   render() {
     const { score } = this.props;
-    const className = score > 21 ? "bust" : "hittable";
+    const className =
+        score > 21 ? "bust" :
+        score === 21 ? "blackjack" :
+        "hittable";
     return <span className={`score ${className}`}>{score}</span>;
   }
 }

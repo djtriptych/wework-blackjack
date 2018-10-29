@@ -19,6 +19,8 @@ body {
 
 #tophat {
   padding-top: 1em;
+  position: relative;
+  background-color: black;
 }
 #tophat .logo {
   background-size: 40%;
@@ -32,6 +34,18 @@ body {
 }
 #tophat .logo .bar {
   color: rgba(255, 255, 255, 0.1);
+}
+#tophat #newGame {
+  position: absolute;
+  right: 12px;
+  top: 16px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 14px;
+  font-weight: bold;
+  border: 0;
+  background-color: green;
+  color: white;
 }
 
 #board {
@@ -58,6 +72,9 @@ body {
 }
 .hand header .score.hittable {
   color: #fdf6e3;
+}
+.hand header .score.blackjack {
+  color: green;
 }
 .hand .cards {
   margin-left: 120px;

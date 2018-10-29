@@ -2,10 +2,10 @@ import _ from 'lodash';
 import React from 'react';
 
 import './App.css';
-import { Board, Card, Hand, Tophat } from "./components";
-import { flipCard } from "./actions";
-import { cardFlips, decks, piles, scores } from "./game";
-import { INITIAL_STATE, PLAYERS } from "./constants.js";
+import { Board, Card, Hand, Tophat } from ".";
+import { flipCard } from "../actions";
+import { cardFlips, decks, piles, scores } from "../game";
+import { INITIAL_STATE, PLAYERS } from "../constants.js";
 
 class App extends React.Component {
   constructor() {
@@ -35,7 +35,7 @@ class App extends React.Component {
     return (
       <div>
         <Tophat />
-        <Board deck={this.state.deck}>
+        <Board>
           {_.map(PLAYERS, (player, index) => (
             <Hand
               key={index}

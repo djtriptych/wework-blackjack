@@ -5,7 +5,7 @@ import api from "./api";
 import Bacon from "baconjs";
 
 import { actions, Action } from "./actions";
-import { ACE, QUEEN, KING, JACK, PLAYERS } from "./constants.js";
+import { ACE, QUEEN, KING, JACK } from "./constants.js";
 
 const playerHits = new Bacon.Bus();
 
@@ -39,17 +39,6 @@ const jsonResponse = req =>
 const decks = actionsByType(Action.newDeck)
   .map(action => api.deck.create())
   .flatMapLatest(jsonResponse);
-
-// Drawn cards from the api, fetched in groups then flattened to a 1d card
-// stream.
-const cards = actionsByType(Action.drawCards)
-  .map(action => api.deck.draw(action.deck_id, action.count))
-  .flatMap(jsonResponse)
-  .map(".cards")
-  .flatMap(cards => {
-    return Bacon.fromArray(cards);
-  })
-  .map(card => _.extend(card, { facing: "down" }));
 
 // Handle player hits.
 actionsByType(Action.hit)
