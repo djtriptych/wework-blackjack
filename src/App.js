@@ -1,25 +1,55 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import _ from 'lodash';
+import React from 'react';
 
-class App extends Component {
+import './App.css';
+import { Board, Card, Hand, Tophat } from "./components";
+import { flipCard } from "./actions";
+import { cardFlips, decks, piles, scores } from "./game";
+import { INITIAL_STATE, PLAYERS } from "./constants.js";
+
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = _.extend({}, INITIAL_STATE());
+  }
+
+  componentDidMount() {
+    // State updates from game logic.
+    piles.onValue(piles => {
+      this.setState({ piles });
+    });
+    decks.onValue(deck => {
+      this.setState({ deck });
+    });
+    scores.onValue(scores => {
+      this.setState({ scores });
+    });
+    cardFlips.onValue(action => {
+      this.setState({
+        piles: _.extend({}, this.state.piles)
+      });
+    });
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <Tophat />
+        <Board deck={this.state.deck}>
+          {_.map(PLAYERS, (player, index) => (
+            <Hand
+              key={index}
+              deck={this.state.deck}
+              playerName={player}
+              cards={this.state.piles[player]}
+              score={this.state.scores[player]}
+            >
+              {_.map(this.state.piles[player], (card, index) => (
+                <Card key={index} flipCard={flipCard} card={card} />
+              ))}
+            </Hand>
+          ))}
+        </Board>
       </div>
     );
   }
